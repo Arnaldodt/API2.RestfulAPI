@@ -1,4 +1,5 @@
 var express = require("express");
+var cors = require("cors");
 
 var mongoose = require("mongoose");
 mongoose.connect('mongodb://localhost/titulo', {useNewUrlParser: true});
@@ -10,19 +11,20 @@ const esquema = new mongoose.Schema({
 const TIT = mongoose.model('tit', esquema);
 
 var app = express();
+app.use(cors());
 app.use(express.json());
- 
+// app.use(express.urlencoded({extended:true}));
 
-app.get('/', function(req, res) {
-    TIT.find()
+app.get('/', async function(req, res) {
+    await TIT.find()
         .then(datos =>{
             if (datos.length===0){
-                res.send({mensaje:"No Existen Datos"})
+                res.json({mensaje:"No Existen Datos"})
             } else {
-                res.send({datos})
+                res.json(datos)
             }
         })
-        .catch(err => res.send({error:err}))
+        .catch(err => res.json(err))
 })
 
 app.post('/', function(req, res) {
@@ -32,20 +34,20 @@ app.post('/', function(req, res) {
     if (description !== undefined){tit.description = description};
     if (completed !== undefined){tit.completed = completed};
     tit.save()
-        .then(newper => {res.send(newper)})
-        .catch(err => res.send({error:err}))
+        .then(newper => {res.json(newper)})
+        .catch(err => res.json(err))
 })
 
 app.get('/:id', function(req, res) {
     TIT.findOne({_id:req.params.id})
     .then(datos =>{
         if (datos === null){
-            res.send({mensaje:"No Existe Dato"})
+            res.json({mensaje:"No Existe Dato"})
         } else {
-            res.send({datos})
+            res.json(datos)
         }
     })
-    .catch(err => res.send({error:err}))
+    .catch(err => res.json(err))
 })
 
 app.put('/:id', function(req, res) {
@@ -53,22 +55,22 @@ app.put('/:id', function(req, res) {
     .then(datos =>{(
         console.log(datos))
         if (datos === null){
-            res.send({mensaje:"No Existe Dato"})
+            res.json({mensaje:"No Existe Dato"})
         } else {
            
             TIT.findOne({_id:req.params.id})
             .then(datos =>{
                 if (datos === null){
-                    res.send({mensaje:"No Existe Dato"})
+                    res.json({mensaje:"No Existe Dato"})
                 } else {
-                    res.send({datos})
+                    res.json(datos)
                 }
             })
-            .catch(err => res.send({error:err}))
+            .catch(err => res.json(err))
 
         }
     })
-    .catch(err => res.send({error:err}))    
+    .catch(err => res.json(err))    
 })
 
 
@@ -77,28 +79,28 @@ app.patch('/:id', function(req, res) {
     .then(datos =>{(
         console.log(datos))
         if (datos === null){
-            res.send({mensaje:"No Existe Dato"})
+            res.json({mensaje:"No Existe Dato"})
         } else {
            
             TIT.findOne({_id:req.params.id})
             .then(datos =>{
                 if (datos === null){
-                    res.send({mensaje:"No Existe Dato"})
+                    res.json({mensaje:"No Existe Dato"})
                 } else {
-                    res.send({datos})
+                    res.json(datos)
                 }
             })
-            .catch(err => res.send({error:err}))
+            .catch(err => res.json(err))
 
         }
     })
-    .catch(err => res.send({error:err}))    
+    .catch(err => res.json(err))    
 })
 
 app.delete('/:id', function(req, res) {
     TIT.deleteOne({_id:req.params.id})
-        .then(res.send({mensaje:"Dato Eliminado"}))
-        .catch(err => res.send({error:err}))
+        .then(res.json({mensaje:"Dato Eliminado"}))
+        .catch(err => res.json(err))
 })
 
 app.listen(8000, function() {
